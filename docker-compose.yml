@@ -1,0 +1,60 @@
+version: '3.5'
+services:
+  nginx:
+    image: 'nginx:1.21.6-alpine'
+    container_name: '${APP_NAME}-nginx'
+    working_dir: /var/www/html
+    restart: unless-stopped
+    volumes:
+      - './:/var/www/html'
+      - './docker/development/nginx/default.conf:/etc/nginx/conf.d/default.conf'
+      - './docker/development/nginx/nginx.conf:/etc/nginx/nginx.conf'
+    depends_on:
+      - database
+    ports:
+      - '80:80'
+      - '443:443'
+    networks:
+      - mafia
+  app:
+    container_name: '${APP_NAME}-php'
+    build:
+      args:
+        user: '${APP_NAME}'
+        uid: 1001
+      context: ./docker/development/php
+      dockerfile: php.docker
+    environment:
+      APP_NAME: '${APP_NAME}'
+    volumes:
+      - './:/var/www/html'
+    working_dir: /var/www/html
+    ports:
+      - '9100:9000'
+    links:
+      - database
+    depends_on:
+      - database
+    networks:
+      - mafia
+  database:
+    image: 'postgres:14.1-alpine'
+    container_name: '${APP_NAME}-database'
+    restart: always
+    environment:
+      - 'POSTGRES_DB=${DB_DATABASE}'
+      - 'POSTGRES_USER=${DB_USERNAME}'
+      - 'POSTGRES_PASSWORD=${DB_PASSWORD}'
+      - AUTOCOMMIT=ON
+    volumes:
+      - './docker/postgres:/var/lib/postgres'
+    ports:
+      - '5433:5432'
+    networks:
+      - mafia
+volumes:
+  database:
+    driver: local
+networks:
+  mafia:
+    driver: bridge

@@ -1,0 +1,57 @@
+FROM composer:2.2.6 AS composer
+
+FROM php:8.2-fpm
+
+ARG user
+ARG uid
+
+RUN apt-get update \
+    && apt-get install -y \
+        libmcrypt-dev \
+        wget \
+        curl \
+        git \
+        libzip-dev \
+        zip \
+        libpq-dev \
+        libxml2-dev \
+        libfreetype6-dev \
+        libjpeg62-turbo-dev \
+        libmcrypt-dev \
+        libwebp-dev \
+        build-essential \
+        unzip \
+        # npm \
+        sudo \
+        postgresql-client \
+        libicu-dev
+        # && phpModules="pdo_mysql"
+
+# RUN apt install supervisor
+RUN pecl install redis
+
+# Clear cache
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Install PHP extensions
+RUN docker-php-ext-install pgsql pdo_pgsql pdo sockets zip soap intl bcmath exif
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp
+RUN docker-php-ext-install gd
+RUN docker-php-ext-install pcntl
+RUN docker-php-ext-enable redis
+
+RUN pecl install xdebug \
+    && docker-php-ext-enable xdebug
+
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+RUN useradd -G www-data,root -u $uid -d /home/$user $user
+RUN mkdir -p /home/$user/.composer && \
+    chown -R $user:$user /home/$user
+
+COPY php.ini /usr/local/etc/php/conf.d
+
+# Set working directory
+WORKDIR /var/www
+
+USER $user
