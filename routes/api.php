@@ -3,7 +3,6 @@
 use App\Models\Game;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Telegram\Bot\Laravel\Facades\Telegram;
 use App\Http\Controllers\WebhookController;
 
 /*
@@ -26,14 +25,13 @@ Route::prefix('webhook')->group(function () {
 });
 
 Route::get('test', function (){
-    dd(\App\Models\UserScope::select(
-        'telegram_user_id', 
-        DB::raw('SUM(scope) as total_scope'), 
-        DB::raw('RANK() OVER (ORDER BY SUM(scope) DESC) as ladder_seat')
-        )->groupBy('telegram_user_id')->get()->toArray());
-    // dd(storage_path('/storage/logo.png'));
-    // dd(\Telegram\Bot\FileUpload\InputFile::create('/storage/logo.png', 'logo.png'));
-    $response = Telegram::setWebhook(['url' => env('TELEGRAM_WEBHOOK_URL')]);
-    // $response = Telegram::getMe();
+    // dd(\App\Models\UserScope::select(
+    //     'telegram_user_id', 
+    //     DB::raw('SUM(scope) as total_scope'), 
+    //     DB::raw('RANK() OVER (ORDER BY SUM(scope) DESC) as ladder_seat')
+    //     )->groupBy('telegram_user_id')->get()->toArray());
+
+    $response = \Telegram\Bot\Laravel\Facades\Telegram::setWebhook(['url' => env('TELEGRAM_WEBHOOK_URL')]);
+    
     dd($response);
 });

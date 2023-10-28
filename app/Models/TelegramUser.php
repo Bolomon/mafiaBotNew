@@ -41,7 +41,7 @@ class TelegramUser extends Model
             'telegram_user_id', 
             DB::raw('SUM(scope) as total_scope'), 
             DB::raw('RANK() OVER (ORDER BY SUM(scope) DESC) as ladder_seat')
-            )->where('telegram_user_id', $this->id)->groupBy('telegram_user_id')->first()->ladder_seat;
+            )->where('telegram_user_id', $this->id)->groupBy('telegram_user_id')->first()?->ladder_seat ?? 0;
     }
 
     public function getGameCountAttribute()
