@@ -46,7 +46,7 @@ class RepeatMessageJob implements ShouldQueue
             if ($this->schedule->min_seats <= $this->schedule->users()->count()) {
                 $this->sendMessage("Напоминаем вам, что вы записаны на игру\n".$this->message);
             }elseif ($this->schedule->min_seats > $this->schedule->users()->count()) {
-                $this->sendMessage("Игра \n".$this->message." отменена, в связи с недостаточным количеством участников");
+                $this->sendMessage("Игра \n".$this->message."\n отменена, в связи с недостаточным количеством участников");
             }
         }
     }
