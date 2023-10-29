@@ -55,7 +55,7 @@ class ScheduleSignUpCallback implements CallbackInterface, ActionInterface
 
         $startDate = Carbon::parse($this->data['schedule']['start_date']);
 
-        RepeatMessageJob::dispatch($this->message(), $chatId, $this->user->id, $this->data['schedule']['id'])->later($startDate->subHour());
+        RepeatMessageJob::dispatch($this->message(), $chatId, $this->user->id, $this->data['schedule']['id'])->delay($startDate->subHour());
         
         return $response;
     }
@@ -86,7 +86,7 @@ class ScheduleSignUpCallback implements CallbackInterface, ActionInterface
 
         $startDate = Carbon::parse($this->data['schedule']['start_date']);
 
-        RepeatMessageJob::dispatch($this->message(), $chatId, $this->user->id, $this->data['schedule']['id'])->later($startDate->subHour());
+        RepeatMessageJob::dispatch($this->message(), $chatId, $this->user->id, $this->data['schedule']['id'])->delay($startDate->subHour());
 
         return $response;
     }
