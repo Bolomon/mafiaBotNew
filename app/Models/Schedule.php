@@ -13,6 +13,7 @@ class Schedule extends Model
         'start_date',
         'seats',
         'address',
+        'min_seats',
         'address_link',
     ];
 

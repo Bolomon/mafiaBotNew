@@ -42,9 +42,6 @@ class WebhookController extends Controller
 
         $user = $update->getMessage();
         
-        Log::debug("user", [$user]);
-        Log::debug("user->chat", [$user->chat]);
-
         $telegramUser = TelegramUser::firstOrCreate(
             ['telegram_id' => $user->chat->id],
             [
@@ -62,6 +59,7 @@ class WebhookController extends Controller
             $message = LastMessage::where('chat_id', $chatId)->first();
             
             Log::debug("callbackData", [$callbackData['data']]);
+            Log::debug("telegramUser", [$telegramUser]);
 
             $callBack->setUser($telegramUser);
             $callBack->setData($callbackData['data']);

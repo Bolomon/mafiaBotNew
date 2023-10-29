@@ -14,7 +14,7 @@ use App\Enums\ImagesEnum;
 use App\Traits\SetData;
 use App\Models\Schedule;
 use Illuminate\Support\Facades\DB;
-
+use App\Jobs\RepeatMessageJob;
 class ScheduleSignUpCallback implements CallbackInterface, ActionInterface
 {
     use SetData;
@@ -38,12 +38,11 @@ class ScheduleSignUpCallback implements CallbackInterface, ActionInterface
     {
         $this->dubleSend($telegram, $chatId);
 
+        $message ="Вы записаны на игру\n".$this->message();
+        
         $response = $telegram->sendPhoto([
             'chat_id' => $chatId,
-            'caption' => "Вы записаны на игру\n"
-                            ."🗓 *".$this->data['schedule']['dayOfTheWeek']." ".$this->data['schedule']['date_day']." ".$this->data['schedule']['date_time']."\n"
-                            .$this->data['schedule']['game']['name']."*\n"
-                            ."🏠 *Место:* [".$this->data['schedule']['address']."](".$this->data['schedule']['address_link'].")",
+            'caption' => $message,
             'photo' => \Telegram\Bot\FileUpload\InputFile::create(ImagesEnum::MAFIA->getImage()),
             'parse_mode' => 'Markdown',
             'reply_markup' => Keyboard::make([
@@ -54,11 +53,15 @@ class ScheduleSignUpCallback implements CallbackInterface, ActionInterface
             ]),
         ]);
 
+        RepeatMessageJob::dispatch($this->message(), $chatId, $this->user->id, $this->data['schedule']['id'])->delay(now()->addMinutes(1));
+        
         return $response;
     }
 
     public function update(Api $telegram, int $chatId, int $messageId): \Telegram\Bot\Objects\Message
     {
+        $message ="Вы записаны на игру\n".$this->message();
+        
         $response = $telegram->deleteMessage([
             'chat_id' => $chatId,
             'message_id' => $messageId,
@@ -68,10 +71,7 @@ class ScheduleSignUpCallback implements CallbackInterface, ActionInterface
 
         $response = $telegram->sendPhoto([
             'chat_id' => $chatId,
-            'caption' => "Вы записаны на игру\n"
-                            ."🗓 *".$this->data['schedule']['dayOfTheWeek']." ".$this->data['schedule']['date_day']." ".$this->data['schedule']['date_time']."\n"
-                            .$this->data['schedule']['game']['name']."*\n"
-                            ."🏠 *Место:* [".$this->data['schedule']['address']."](".$this->data['schedule']['address_link'].")",
+            'caption' => $message,
             'photo' => \Telegram\Bot\FileUpload\InputFile::create(ImagesEnum::MAFIA->getImage()),
             'parse_mode' => 'Markdown',
             'reply_markup' => Keyboard::make([
@@ -81,6 +81,8 @@ class ScheduleSignUpCallback implements CallbackInterface, ActionInterface
                 'resize_keyboard' => true,
             ]),
         ]);
+        
+        RepeatMessageJob::dispatch($this->message(), $chatId, $this->user->id, $this->data['schedule']['id'])->delay(now()->addMinutes(1));
 
         return $response;
     }
@@ -134,5 +136,12 @@ class ScheduleSignUpCallback implements CallbackInterface, ActionInterface
     public function action(): void
     {
         $this->user->schedules()->syncWithoutDetaching([$this->data['schedule']['id']]);
+    }
+
+    private function message(): string
+    {
+        return "🗓 *".$this->data['schedule']['dayOfTheWeek']." ".$this->data['schedule']['date_day']." ".$this->data['schedule']['date_time']."\n"
+        .$this->data['schedule']['game']['name']."*\n"
+        ."🏠 *Место:* [".$this->data['schedule']['address']."](".$this->data['schedule']['address_link'].")";
     }
 }

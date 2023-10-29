@@ -81,22 +81,24 @@ class RulesCallback implements CallbackInterface
         $this->data = $data;
 
         $this->backButton = 
-        [[
-            'text' => 'Назад',
-            'callback_data' => json_encode([
-                'entity' => 'gameInfo', 
-                'data' => [
-                    'slug' => $data['slug']
-                ]
-            ]),
-        ],
         [
-            'text' => 'Главное меню',
-            'callback_data' => json_encode([
-                'entity' => 'main_menu', 
-                'data' => null
-            ])
-        ]];
+            [
+                'text' => 'Назад',
+                'callback_data' => json_encode([
+                    'entity' => 'gameInfo', 
+                    'data' => [
+                        'slug' => $data['slug']
+                    ]
+                ]),
+            ],
+            [
+                'text' => 'Главное меню',
+                'callback_data' => json_encode([
+                    'entity' => 'main_menu', 
+                    'data' => null
+                ])
+            ]
+        ];
     }
 
     private function getrule($slug)
@@ -109,7 +111,7 @@ class RulesCallback implements CallbackInterface
     private function getruleDocuments($slug)
     {
         $documents = Game::where('slug', $slug)->with('rule')->first()->rule->getMedia()->toArray();
-
+        
         return $documents;
     }
 }

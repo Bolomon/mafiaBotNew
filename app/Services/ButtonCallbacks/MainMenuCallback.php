@@ -47,27 +47,34 @@ class MainMenuCallback implements CallbackInterface
                     ]),
                 ],
             ],
-            [
-                [
-                    'text' => 'FAQ',
-                    'callback_data' => json_encode([
-                        'entity' => 'faq', 
-                        'data' => null
-                    ]),
-                ],
-                [
-                    'text' => 'Правила',
-                    'callback_data' => json_encode([
-                        'entity' => 'rules', 
-                        'data' => null
-                    ]),
-                ],
-            ],
+            // [
+            //     [
+            //         'text' => 'FAQ',
+            //         'callback_data' => json_encode([
+            //             'entity' => 'faq', 
+            //             'data' => null
+            //         ]),
+            //     ],
+            //     [
+            //         'text' => 'Правила',
+            //         'callback_data' => json_encode([
+            //             'entity' => 'rules', 
+            //             'data' => null
+            //         ]),
+            //     ],
+            // ],
             [
                 [
                     'text' => 'Профиль игрока',
                     'callback_data' => json_encode([
                         'entity' => 'profile', 
+                        'data' => null
+                    ]),
+                ],
+                [
+                    'text' => 'FAQ',
+                    'callback_data' => json_encode([
+                        'entity' => 'faq', 
                         'data' => null
                     ]),
                 ],

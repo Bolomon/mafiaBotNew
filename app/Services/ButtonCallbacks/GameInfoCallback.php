@@ -95,7 +95,7 @@ class GameInfoCallback implements CallbackInterface
         return [
             'text' => 'Правила',
             'callback_data' => json_encode([
-                'entity' => 'rule', 
+                'entity' => 'rules', 
                 'data' => [
                     'slug' => $this->data['slug'],
                 ]
