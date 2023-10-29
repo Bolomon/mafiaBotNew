@@ -53,7 +53,9 @@ class ScheduleSignUpCallback implements CallbackInterface, ActionInterface
             ]),
         ]);
 
-        RepeatMessageJob::dispatch($this->message(), $chatId, $this->user->id, $this->data['schedule']['id'])->delay(now()->addMinutes(1));
+        $startDate = Carbon::parse($this->data['schedule']['start_date']);
+
+        RepeatMessageJob::dispatch($this->message(), $chatId, $this->user->id, $this->data['schedule']['id'])->later($startDate->subHour());
         
         return $response;
     }
@@ -81,8 +83,10 @@ class ScheduleSignUpCallback implements CallbackInterface, ActionInterface
                 'resize_keyboard' => true,
             ]),
         ]);
-        
-        RepeatMessageJob::dispatch($this->message(), $chatId, $this->user->id, $this->data['schedule']['id'])->delay(now()->addMinutes(1));
+
+        $startDate = Carbon::parse($this->data['schedule']['start_date']);
+
+        RepeatMessageJob::dispatch($this->message(), $chatId, $this->user->id, $this->data['schedule']['id'])->later($startDate->subHour());
 
         return $response;
     }
