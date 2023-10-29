@@ -24,6 +24,6 @@ class Schedule extends Model
 
     public function users()
     {
-        return $this->belongsToMany(TelegramUser::class, 'schedule_user', 'telegram_user_id');
+        return $this->belongsToMany(TelegramUser::class, 'schedule_user', 'schedule_id', 'telegram_user_id', 'id', 'id');
     }
 }

@@ -82,6 +82,8 @@ class ScheduleCallback implements CallbackInterface
 
         $this->data = $schedule;
         
+        Log::debug('schedule'. json_encode($schedule));
+
         $this->backButton = [
             'text' => 'Главное меню',
             'callback_data' => json_encode([
