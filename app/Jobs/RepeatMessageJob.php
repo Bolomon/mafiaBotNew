@@ -55,10 +55,14 @@ class RepeatMessageJob implements ShouldQueue
     {
         $lastMessage = LastMessage::where('chat_id', $this->chatId)->first();
 
-        Telegram::bot()->deleteMessage([
-            'chat_id' => $this->chatId,
-            'message_id' => $lastMessage->message_id,
-        ]);
+        try {
+            Telegram::bot()->deleteMessage([
+                'chat_id' => $this->chatId,
+                'message_id' => $lastMessage->message_id,
+            ]);
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
 
         Telegram::sendPhoto([
             'chat_id' => $this->chatId,
