@@ -64,10 +64,10 @@ class ScheduleSignUpCallback implements CallbackInterface, ActionInterface
     {
         $message ="Вы записаны на игру\n".$this->message();
         
-        $response = $telegram->deleteMessage([
-            'chat_id' => $chatId,
-            'message_id' => $messageId,
-        ]);
+        // $response = $telegram->deleteMessage([
+        //     'chat_id' => $chatId,
+        //     'message_id' => $messageId,
+        // ]);
 
         $this->dubleSend($telegram, $chatId);
 

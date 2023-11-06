@@ -28,10 +28,15 @@ class FaqCallback implements CallbackInterface
     
     public function update(\Telegram\Bot\Api $telegram, int $chatId, int $messageId): Message
     {
-        $response = $telegram->deleteMessage([
-            'chat_id' => $chatId,
-            'message_id' => $messageId,
-        ]);
+        // try {
+        //     $response = $telegram->deleteMessage([
+        //         'chat_id' => $chatId,
+        //         'message_id' => $messageId,
+        //     ]);
+        // } catch (\Throwable $th) {
+
+        // }
+        
 
         $this->sendFaqMessages($telegram, $chatId);
 

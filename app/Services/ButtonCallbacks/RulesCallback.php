@@ -35,10 +35,10 @@ class RulesCallback implements CallbackInterface
 
     public function update(Api $telegram, int $chatId, int $messageId): Message
     {
-        $response = $telegram->deleteMessage([
-            'chat_id' => $chatId,
-            'message_id' => $messageId,
-        ]);
+        // $response = $telegram->deleteMessage([
+        //     'chat_id' => $chatId,
+        //     'message_id' => $messageId,
+        // ]);
 
         $this->sendruleMessages($telegram, $chatId);
 

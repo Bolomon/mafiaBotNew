@@ -45,10 +45,10 @@ class ScheduleUnrecordCallback implements CallbackInterface, ActionInterface
 
     public function update(Api $telegram, int $chatId, int $messageId): \Telegram\Bot\Objects\Message
     {
-        $response = $telegram->deleteMessage([
-            'chat_id' => $chatId,
-            'message_id' => $messageId,
-        ]);
+        // $response = $telegram->deleteMessage([
+        //     'chat_id' => $chatId,
+        //     'message_id' => $messageId,
+        // ]);
 
         $this->dubleSend($telegram, $chatId);
 

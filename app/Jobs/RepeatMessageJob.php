@@ -53,16 +53,16 @@ class RepeatMessageJob implements ShouldQueue
 
     private function sendMessage(string $message): void
     {
-        $lastMessage = LastMessage::where('chat_id', $this->chatId)->first();
+        // $lastMessage = LastMessage::where('chat_id', $this->chatId)->first();
 
-        try {
-            Telegram::bot()->deleteMessage([
-                'chat_id' => $this->chatId,
-                'message_id' => $lastMessage->message_id,
-            ]);
-        } catch (\Throwable $th) {
-            //throw $th;
-        }
+        // try {
+        //     Telegram::bot()->deleteMessage([
+        //         'chat_id' => $this->chatId,
+        //         'message_id' => $lastMessage->message_id,
+        //     ]);
+        // } catch (\Throwable $th) {
+        //     //throw $th;
+        // }
 
         Telegram::sendPhoto([
             'chat_id' => $this->chatId,
@@ -75,9 +75,9 @@ class RepeatMessageJob implements ShouldQueue
 
         $response = $callBack->send(Telegram::bot(), $this->chatId);
 
-        $lastMessage->update([
-            'chat_id' => $this->chatId,
-            'message_id' => $response->message_id
-        ]);
+        // $lastMessage->update([
+        //     'chat_id' => $this->chatId,
+        //     'message_id' => $response->message_id
+        // ]);
     }
 }
