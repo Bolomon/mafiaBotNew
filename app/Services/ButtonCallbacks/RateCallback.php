@@ -2,6 +2,7 @@
 namespace App\Services\ButtonCallbacks;
 use App\Models\TelegramUser;
 use App\Services\Interfaces\CallbackInterface;
+use DB;
 use Log;
 use App\Traits\SetData;
 use \Telegram\Bot\Objects\Message;
@@ -75,10 +76,28 @@ class RateCallback implements CallbackInterface
     public function setData(?array $data): void
     {
         $this->data = $data;
-        $this->data['users'] = TelegramUser::withSum('userScopes', 'scope')
-                                            ->orderBy('user_scopes_sum_scope', 'desc')
-                                            ->take(10)
-                                            ->get()->toArray();
+        $this->data['users'] = TelegramUser::select('telegram_users.*', DB::raw('
+                                                        (SELECT SUM(scope) 
+                                                        FROM telegram_user_scopes 
+                                                        WHERE telegram_users.id = telegram_user_scopes.telegram_user_id) 
+                                                        AS user_scopes_sum_scope
+                                                    '))
+                                                    ->where(function($query) {
+                                                        $query->whereNotNull(DB::raw('
+                                                            (SELECT SUM(scope) 
+                                                            FROM telegram_user_scopes 
+                                                            WHERE telegram_users.id = telegram_user_scopes.telegram_user_id)
+                                                        '));
+                                                    })
+                                                    ->orderBy(
+                                                        DB::raw('
+                                                            (SELECT SUM(scope) 
+                                                            FROM telegram_user_scopes 
+                                                            WHERE telegram_users.id = telegram_user_scopes.telegram_user_id)
+                                                        '), 'desc')
+                                                    ->limit(10)
+                                                    ->get()
+                                                    ->toArray();
         
         Log::info('RateCallback $this->data'. json_encode($this->data));
 

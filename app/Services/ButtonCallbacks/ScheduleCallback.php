@@ -76,7 +76,7 @@ class ScheduleCallback implements CallbackInterface
                                     DB::raw('DATE(start_date) as date_day'),
                                     DB::raw("TO_CHAR(start_date, 'HH24:MI') as date_time")
                                 )
-                                ->where('start_date', '>', now()->addHour())
+                                ->where('start_date', '>', now())
                                 ->orderBy('start_date', 'asc')
                                 ->get()->toArray();
 
