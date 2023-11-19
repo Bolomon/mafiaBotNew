@@ -14,6 +14,7 @@ use App\Enums\ImagesEnum;
 use App\Traits\SetData;
 use App\Models\Schedule;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redis;
 
 class ScheduleUnrecordCallback implements CallbackInterface, ActionInterface
 {
@@ -39,17 +40,12 @@ class ScheduleUnrecordCallback implements CallbackInterface, ActionInterface
                 'resize_keyboard' => true,
             ]),
         ]);
-
+        
         return $response;
     }
 
     public function update(Api $telegram, int $chatId, int $messageId): \Telegram\Bot\Objects\Message
     {
-        // $response = $telegram->deleteMessage([
-        //     'chat_id' => $chatId,
-        //     'message_id' => $messageId,
-        // ]);
-
         $this->dubleSend($telegram, $chatId);
 
         $response = $telegram->sendPhoto([
@@ -66,7 +62,7 @@ class ScheduleUnrecordCallback implements CallbackInterface, ActionInterface
                 'resize_keyboard' => true,
             ]),
         ]);
-
+        
         return $response;
     }
 
@@ -131,5 +127,12 @@ class ScheduleUnrecordCallback implements CallbackInterface, ActionInterface
     public function action(): void
     {
         $this->user->schedules()->detach($this->data['schedule']['id']);
+        $this->setHash();
+    }
+
+    private function setHash(): void
+    {
+        $hash = md5('user:'.$this->user->id.'schedule:'.$this->data['schedule']['id']);
+        Redis::hSet("user_hashes", $hash, false);
     }
 }

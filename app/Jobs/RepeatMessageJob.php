@@ -16,6 +16,7 @@ use Telegram\Bot\Laravel\Facades\Telegram;
 use App\Services\ButtonCallbacks\MainMenuCallback;
 use App\Models\TelegramUser;
 use App\Models\Schedule;
+use Illuminate\Support\Facades\Redis;
 
 class RepeatMessageJob implements ShouldQueue
 {
@@ -34,7 +35,6 @@ class RepeatMessageJob implements ShouldQueue
     )
     {
         $this->user = TelegramUser::where("id", $userId)->first();
-        $this->schedule = Schedule::where("id", $scheduleId)->first();
     }
 
     /**
@@ -42,7 +42,12 @@ class RepeatMessageJob implements ShouldQueue
      */
     public function handle(): void
     {
-        if ($this->user->schedules()->where('schedule_id', $this->scheduleId)->exists()) {
+        $this->schedule = Schedule::where("id", $this->scheduleId)->first();
+
+        $hash = md5('user:'.$this->userId.'schedule:'.$this->scheduleId);
+
+        // if ($this->user->schedules()->where('schedule_id', $this->scheduleId)->exists()) {
+        if ((bool)Redis::hGet('user_hashes', $hash)) {
             if ($this->schedule->min_seats <= $this->schedule->users()->count()) {
                 $this->sendMessage("Напоминаем вам, что вы записаны на игру\n".$this->message);
             }elseif ($this->schedule->min_seats > $this->schedule->users()->count()) {

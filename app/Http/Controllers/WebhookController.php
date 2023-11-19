@@ -38,11 +38,7 @@ class WebhookController extends Controller
         Log::debug("updates", [$update]);
         
         $chatId = $update->getChat()->id;
-        // $lastMessageExists = LastMessage::where('chat_id', $chatId)->exists();
-
-        // Log::debug("lastTest", [$this->telegram->getMessages(['chat_id' => $chatId, 'limit' => 1])]);
-        // Log::debug("lastTest", [$update->getChat()]);
-        // Log::debug("lastTest", [$update->getChat()]);
+        
         Log::debug("getMessage ", [$update->getMessage()]);
 
         $user = $update->getMessage();
@@ -61,7 +57,6 @@ class WebhookController extends Controller
             $callbackData = json_decode($update->callback_query->data, true);
             
             $callBack = CallBackSwitcher::getEntity($callbackData['entity']);
-            // $message = LastMessage::where('chat_id', $chatId)->first();
             
             Log::debug("callbackData", [$callbackData['data']]);
             Log::debug("telegramUser", [$telegramUser]);
@@ -87,22 +82,6 @@ class WebhookController extends Controller
         }
         
         $messageId = $response->getMessageId();
-
-
-        // if ($messageId !== null) {
-        //     if ($lastMessageExists) {
-        //         $lastMessage = LastMessage::where('chat_id', $chatId)->first();
-        //         $lastMessage->update([
-        //             'chat_id' => $chatId,
-        //             'message_id' => $messageId
-        //         ]);
-        //     } else {
-        //         LastMessage::create([
-        //             'chat_id' => $chatId,
-        //             'message_id' => $messageId
-        //         ]);
-        //     }
-        // }
 
         return response([], Response::HTTP_OK);
     }

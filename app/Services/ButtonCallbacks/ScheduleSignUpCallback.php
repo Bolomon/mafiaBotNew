@@ -15,6 +15,8 @@ use App\Traits\SetData;
 use App\Models\Schedule;
 use Illuminate\Support\Facades\DB;
 use App\Jobs\RepeatMessageJob;
+use Illuminate\Support\Facades\Redis;
+
 class ScheduleSignUpCallback implements CallbackInterface, ActionInterface
 {
     use SetData;
@@ -55,19 +57,25 @@ class ScheduleSignUpCallback implements CallbackInterface, ActionInterface
 
         $startDate = Carbon::parse($this->data['schedule']['start_date']);
 
-        RepeatMessageJob::dispatch($this->message(), $chatId, $this->user->id, $this->data['schedule']['id'])->delay($startDate->subHour());
+        $hash = md5('user:'.$this->user->id.'schedule:'.$this->data['schedule']['id']);
+
+        if (!Redis::hExists("user_hashes", $hash)) {
+            RepeatMessageJob::dispatch($this->message(), $chatId, $this->user->id, $this->data['schedule']['id'])->delay($startDate->subHour());
+        }
         
+        $this->setHash($hash);
+
         return $response;
+    }
+
+    private function setHash(string $hash): void
+    {
+        Redis::hSet("user_hashes", $hash, true);
     }
 
     public function update(Api $telegram, int $chatId, int $messageId): \Telegram\Bot\Objects\Message
     {
         $message ="Вы записаны на игру\n".$this->message();
-        
-        // $response = $telegram->deleteMessage([
-        //     'chat_id' => $chatId,
-        //     'message_id' => $messageId,
-        // ]);
 
         $this->dubleSend($telegram, $chatId);
 
@@ -86,7 +94,13 @@ class ScheduleSignUpCallback implements CallbackInterface, ActionInterface
 
         $startDate = Carbon::parse($this->data['schedule']['start_date']);
 
-        RepeatMessageJob::dispatch($this->message(), $chatId, $this->user->id, $this->data['schedule']['id'])->delay($startDate->subHour());
+        $hash = md5('user:'.$this->user->id.'schedule:'.$this->data['schedule']['id']);
+
+        if (!Redis::hExists("user_hashes", $hash)) {
+            RepeatMessageJob::dispatch($this->message(), $chatId, $this->user->id, $this->data['schedule']['id'])->delay($startDate->subHour());
+        }
+
+        $this->setHash($hash);
 
         return $response;
     }
